@@ -1,74 +1,111 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function Index() {
+    const [location, setLocation] = useState<Location.LocationObject | null>(null);
+    const [weather, setWeather] = useState<{
+        city: string;
+        temperature: number;
+        condition: string;
+    } | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+    useEffect(() => {
+        (async () => {
+            try {
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setError('Permission to access location was denied');
+                    setLoading(false);
+                    return;
+                }
+
+                let location = await Location.getCurrentPositionAsync({});
+                setLocation(location);
+
+                // Note: Replace with actual weather API
+                setWeather({
+                    city: 'Chicago',
+                    temperature: -18,
+                    condition: 'snow'
+                });
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An unknown error occurred');
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
+
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size="large" color="#fff" />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.error}>{error}</Text>
+            </View>
+        );
+    }
+
+    return (
+        <View style={styles.container}>
+            {weather && (
+                <>
+                    <Text style={styles.city}>{weather.city}</Text>
+                    <Text style={styles.temperature}>{weather.temperature}°</Text>
+                    <MaterialCommunityIcons name="snowflake" size={100} color="white" />
+                </>
+            )}
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#7393B3',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    city: {
+        fontSize: 48,
+        color: 'white',
+        marginBottom: 10,
+    },
+    temperature: {
+        fontSize: 86,
+        color: 'white',
+        marginBottom: 20,
+    },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 0,
+        flexDirection: 'row',
+        width: '100%',
+        paddingBottom: 40,
+    },
+    button: {
+        flex: 1,
+        padding: 20,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 20,
+    },
+    error: {
+        color: 'white',
+        fontSize: 18,
+        textAlign: 'center',
+        margin: 20,
+    },
 });

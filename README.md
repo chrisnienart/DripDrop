@@ -1,50 +1,47 @@
-# Welcome to your Expo app 👋
+# DripDrop Weather App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple and elegant weather application built with React Native and Expo.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Display current weather based on user location
+- Show city name, temperature, and weather condition
+- Login and Options screens (coming soon)
 
-   ```bash
-   npm install
-   ```
+## Setup Instructions
 
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+1. Install dependencies:
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Start the development server:
+```bash
+npx expo start
+```
 
-## Learn more
+3. Run on your device:
+   - Install the Expo Go app on your iOS or Android device
+   - Scan the QR code from the terminal with your device camera
 
-To learn more about developing your project with Expo, look at the following resources:
+## Dependencies
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- expo
+- react-native
+- expo-location
+- axios
+- @expo/vector-icons
 
-## Join the community
+## Note
 
-Join our community of developers creating universal apps.
+This is a basic implementation. To get real weather data, you'll need to:
+1. Sign up for a weather API service
+2. Add your API key to the app
+3. Implement the actual API calls
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Coming Soon
+
+- Login functionality
+- Options/Settings screen
+- Detailed weather forecast
+- More weather information
