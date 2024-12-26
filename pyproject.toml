@@ -5,9 +5,11 @@ description = "Weather service integration using OpenWeatherMap API"
 authors = [""]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 requests = "^2.31.0"
 python-dotenv = "^1.0.0"
+uvicorn = "^0.34.0"
+fastapi = "^0.115.6"
 
 [build-system]
 requires = ["poetry-core"]

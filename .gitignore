@@ -36,7 +36,7 @@ yarn-error.*
 *.tsbuildinfo
 
 # aider
-.aider
+.aider.*
 
 # folders
 app-example
