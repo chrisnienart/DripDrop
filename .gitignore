@@ -30,14 +30,17 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
 *.tsbuildinfo
 
 # aider
-.aider
+.aider.*
 
 # folders
 app-example
 plan/
+__pycache__
+api/__pycache__

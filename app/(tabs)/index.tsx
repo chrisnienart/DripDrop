@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Platform, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
+import Constants from 'expo-constants';
 
 export default function Index() {
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -16,6 +17,7 @@ export default function Index() {
     useEffect(() => {
         (async () => {
             try {
+                // Request location permissions
                 let { status } = await Location.requestForegroundPermissionsAsync();
                 if (status !== 'granted') {
                     setError('Permission to access location was denied');
@@ -23,14 +25,36 @@ export default function Index() {
                     return;
                 }
 
+                // Get current location
                 let location = await Location.getCurrentPositionAsync({});
                 setLocation(location);
 
-                // Note: Replace with actual weather API
+                // Determine API URL dynamically
+                const apiUrl = Platform.select({
+                    ios: 'http://192.168.68.91:8080',
+                    android: 'http://10.0.2.2:8080',
+                    default: 'http://localhost:8080'
+                });
+
+                // Fetch weather using current location
+                const response = await fetch(`${apiUrl}/api/weather/current?lat=${location.coords.latitude}&lon=${location.coords.longitude}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to fetch weather data: ${errorText}`);
+                }
+
+                const weatherData = await response.json();
+
                 setWeather({
-                    city: 'Chicago',
-                    temperature: -18,
-                    condition: 'snow'
+                    city: weatherData.location_name,
+                    temperature: Math.round(weatherData.temperature),
+                    condition: weatherData.description
                 });
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -52,6 +76,7 @@ export default function Index() {
         return (
             <View style={styles.container}>
                 <Text style={styles.error}>{error}</Text>
+                <Text style={styles.errorDetails}>{error}</Text>
             </View>
         );
     }
@@ -62,11 +87,26 @@ export default function Index() {
                 <>
                     <Text style={styles.city}>{weather.city}</Text>
                     <Text style={styles.temperature}>{weather.temperature}°</Text>
-                    <MaterialCommunityIcons name="snowflake" size={100} color="white" />
+                    <MaterialCommunityIcons 
+                        name={getWeatherIcon(weather.condition)} 
+                        size={100} 
+                        color="white" 
+                    />
+                    <Text style={styles.condition}>{weather.condition}</Text>
                 </>
             )}
         </View>
     );
+}
+
+// Helper function to map weather conditions to appropriate icons
+function getWeatherIcon(condition: string): keyof typeof MaterialCommunityIcons.glyphMap {
+    const conditionLower = condition.toLowerCase();
+    if (conditionLower.includes('snow')) return 'snowflake';
+    if (conditionLower.includes('rain')) return 'weather-rainy';
+    if (conditionLower.includes('cloud')) return 'weather-cloudy';
+    if (conditionLower.includes('clear')) return 'weather-sunny';
+    return 'weather-partly-cloudy'; // default icon
 }
 
 const styles = StyleSheet.create({
@@ -86,26 +126,22 @@ const styles = StyleSheet.create({
         color: 'white',
         marginBottom: 20,
     },
-    buttonContainer: {
-        position: 'absolute',
-        bottom: 0,
-        flexDirection: 'row',
-        width: '100%',
-        paddingBottom: 40,
-    },
-    button: {
-        flex: 1,
-        padding: 20,
-        alignItems: 'center',
-    },
-    buttonText: {
+    condition: {
+        fontSize: 24,
         color: 'white',
-        fontSize: 20,
+        marginTop: 10,
+        textTransform: 'capitalize',
     },
     error: {
         color: 'white',
         fontSize: 18,
         textAlign: 'center',
         margin: 20,
+    },
+    errorDetails: {
+        color: 'red',
+        fontSize: 14,
+        textAlign: 'center',
+        marginHorizontal: 20,
     },
 });
